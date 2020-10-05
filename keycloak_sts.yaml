@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: jdbc
+    port: 9101
+    protocol: TCP
+    targetPort: 9101
+  - name: discovery
+    port: 7600
+    targetPort: 7600
+  clusterIP: None
+  selector:
+    app: keycloak
+  sessionAffinity: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: keycloak
+spec:
+  serviceName: "keycloak"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak-container
+        image: vince15dk/keycloack:0.1
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 200m
+          limits:
+            memory: 1Gi
+            cpu: 512Mi
+        env:
+        - name: DB_USER
+          value: "keycloak"
+        - name: DB_PASSWORD
+          value: "keycloak"
+        - name: DB_ADDR
+          value: "keycloak-psql-svc"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_VENDOR
+          value: "POSTGRES"        
+        - name: KEYCLOAK_USER
+          value: "admin"
+        - name: KEYCLOAK_PASSWORD
+          value: "pass"
+        - name: JGROUPS_DISCOVERY_PROTOCOL
+          value: "dns.DNS_PING"
+        - name: JGROUPS_DISCOVERY_PROPERTIES
+          value: "dns_query=keycloak.key.svc.cluster.local"
+        - name: PROXY_ADDRESS_FORWARDING
+          value: "true"
+        ports:
+        - containerPort: 8080
+        - containerPort: 9101
+        - containerPort: 7600
