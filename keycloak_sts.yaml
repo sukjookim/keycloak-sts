@@ -43,19 +43,17 @@ spec:
             memory: 512Mi
             cpu: 200m
           limits:
-            memory: 1Gi
+            memory: 512Mi
             cpu: 512Mi
         env:
         - name: DB_USER
-          value: "keycloak"
+          value: "admin"
         - name: DB_PASSWORD
-          value: "keycloak"
+          value: "admin1234"
         - name: DB_ADDR
-          value: "keycloak-psql-svc"
+          value: "stolon-proxy"
         - name: DB_PORT
           value: "5432"
-        - name: DB_VENDOR
-          value: "POSTGRES"        
         - name: KEYCLOAK_USER
           value: "admin"
         - name: KEYCLOAK_PASSWORD
